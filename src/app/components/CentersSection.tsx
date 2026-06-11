@@ -93,10 +93,10 @@ export function CentersSection() {
             </div>
           </div>
           <a
-            href="tel:892139004"
+            href="tel:+91892139004"
             className="px-6 py-3 bg-[#1e88e5] hover:bg-[#1565c0] text-white font-bold rounded-full transition-colors duration-300 text-sm whitespace-nowrap"
           >
-            📞 Call: 892139004
+            📞 Call: +91892139004
           </a>
         </motion.div>
       </div>

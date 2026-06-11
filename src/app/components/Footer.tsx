@@ -88,8 +88,8 @@ export function Footer() {
                 <Phone size={16} className="text-[#1e88e5] flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-white/40 text-xs uppercase tracking-wide mb-0.5">Phone / WhatsApp</p>
-                  <a href="tel:892139004" className="text-white font-semibold hover:text-[#4db6e8] transition-colors">
-                    892139004
+                  <a href="tel:+91892139004" className="text-white font-semibold hover:text-[#4db6e8] transition-colors">
+                    +91892139004
                   </a>
                 </div>
               </div>

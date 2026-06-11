@@ -1,3 +1,4 @@
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Navbar } from "./components/Navbar";
 import { HeroBanner } from "./components/HeroBanner";
 import { AboutSection } from "./components/AboutSection";
@@ -6,8 +7,9 @@ import { DoctorsSection } from "./components/DoctorsSection";
 import { CentersSection } from "./components/CentersSection";
 import { ContactSection } from "./components/ContactSection";
 import { Footer } from "./components/Footer";
+import { AdminPage } from "./components/AdminPage";
 
-export default function App() {
+function HomePage() {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
@@ -23,7 +25,7 @@ export default function App() {
 
       {/* WhatsApp floating button */}
       <a
-        href="https://wa.me/892139004"
+        href="https://wa.me/+91892139004"
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[#25d366] hover:bg-[#1ebe5d] flex items-center justify-center shadow-2xl hover:scale-110 transition-all duration-300"
@@ -34,5 +36,16 @@ export default function App() {
         </svg>
       </a>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/admin" element={<AdminPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
