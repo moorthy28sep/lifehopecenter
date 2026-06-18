@@ -3,7 +3,7 @@ import { motion, useInView } from "motion/react";
 import { MapPin, Clock } from "lucide-react";
 
 const centers = [
-  { city: "Thiruvananthapuram", state: "Kerala (HQ)", desc: "SDA Campus, Near Ponnara School, PS Nagar, Vallakkadu", isHQ: true },
+  { city: "Thiruvananthapuram", state: "Kerala", desc: "SDA Campus, Near Ponnara School, PS Nagar, Vallakkadu", isHQ: false },
   { city: "Patna", state: "Bihar", desc: "Lifestyle & Wellness Center", isHQ: false },
   { city: "Jaipur", state: "Rajasthan", desc: "Lifestyle & Wellness Center", isHQ: false },
   { city: "Varanasi", state: "Uttar Pradesh", desc: "Lifestyle & Wellness Center", isHQ: false },
@@ -49,11 +49,7 @@ export function CentersSection() {
                   : "bg-white border-gray-100 hover:border-[#1e88e5]/30"
               }`}
             >
-              {center.isHQ && (
-                <span className="absolute top-4 right-4 text-xs bg-[#1e88e5] text-white px-2.5 py-1 rounded-full font-semibold">
-                  Headquarters
-                </span>
-              )}
+              {center.isHQ && ('')}
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center mb-4 ${
                   center.isHQ ? "bg-[#1e88e5]" : "bg-[#1e88e5]/10 group-hover:bg-[#1e88e5] transition-colors"

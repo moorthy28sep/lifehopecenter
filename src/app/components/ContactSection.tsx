@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { motion, useInView } from "motion/react";
 import { Phone, MapPin, Clock, MessageCircle, Send } from "lucide-react";
-import { supabase } from "../../lib/supabase";
+
 
 const initialFormState = {
   name: "",
@@ -14,7 +14,7 @@ const initialFormState = {
 const branchDetails = [
   {
     city: "Thiruvananthapuram",
-    state: "Kerala (HQ)",
+    state: "Kerala",
     address: "SDA Campus, Near Ponnara School, PS Nagar, Vallakkadu",
     phone: "+91 892139004",
   },
@@ -72,23 +72,30 @@ export function ContactSection() {
   setErrorMessage("");
 
   try {
-    const { error } = await supabase
-      .from("contact_requests")
-      .insert([
-        {
+    const response = await fetch(
+      "https://lifehopewellness.com/api/contact.php",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           name: formState.name,
           phone: formState.phone,
           email: formState.email,
-          preferred_service: formState.preferredService,
-          health_concern: formState.healthConcern,
-        },
-      ]);
+          preferredService: formState.preferredService,
+          healthConcern: formState.healthConcern,
+        }),
+      }
+    );
 
-    if (error) {
-      throw error;
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error("Submission failed");
     }
 
-    alert("Request submitted successfully!");
+    setSubmitted(true);
 
     setFormState({
       name: "",
@@ -97,6 +104,7 @@ export function ContactSection() {
       preferredService: "",
       healthConcern: "",
     });
+
   } catch (err) {
     console.error(err);
     setErrorMessage("Unable to submit request. Please try again.");

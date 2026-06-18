@@ -3,12 +3,12 @@ import { motion, AnimatePresence } from "motion/react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const slides = [
-  {
-    image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx5b2dhJTIwbWVkaXRhdGlvbiUyMG5hdHVyZSUyMGhlYWxpbmd8ZW58MXx8fHwxNzgwNjY1NDU2fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    heading: "Pathway to Healthy Life",
-    sub: "Experience holistic wellness through natural therapies, lifestyle transformation and expert medical guidance.",
-    tag: "Natural • Safe • Effective",
-  },
+   {
+  image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1920&q=80",
+  heading: "Pathway to Healthy Life",
+  sub: "Experience holistic wellness through natural therapies, lifestyle transformation and expert medical guidance.",
+  tag: "Natural • Safe • Effective",
+},
   {
     image: "https://images.unsplash.com/photo-1524863479829-916d8e77f114?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHw0fHx5b2dhJTIwbWVkaXRhdGlvbiUyMG5hdHVyZSUyMGhlYWxpbmd8ZW58MXx8fHwxNzgwNjY1NDU2fDA&ixlib=rb-4.1.0&q=80&w=1080",
     heading: "Reverse Disease Naturally",

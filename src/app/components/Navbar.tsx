@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Menu, X, Phone } from "lucide-react";
+import LogoComponent from "./LogoComponent";
 
 const navLinks = [
   { label: "Home", href: "#home" },
@@ -37,7 +38,7 @@ export function Navbar() {
         initial={{ y: -10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className={`fixed top-[34px] left-0 right-0 z-40 transition-all duration-300 ${
+        className={`fixed top-[30px] left-0 right-0 z-40 transition-all duration-300 ${
           scrolled ? "bg-white shadow-lg" : "bg-white/95 backdrop-blur-md shadow-md"
         }`}
       >
@@ -46,74 +47,7 @@ export function Navbar() {
           <a href="#home" className="flex items-center gap-3">
             <div className="relative w-11 h-11 flex-shrink-0">
               {/* Sun/star logo recreation */}
-              <svg
-  viewBox="0 0 200 200"
-  className="w-full h-full"
-  xmlns="http://www.w3.org/2000/svg"
->
-  <g transform="translate(100 100)">
-    {/* Outer petals */}
-    {[
-      { angle: 0, color: "#E64A19" },
-      { angle: 45, color: "#B71C1C" },
-      { angle: 90, color: "#FBC02D" },
-      { angle: 135, color: "#F9A825" },
-      { angle: 180, color: "#E64A19" },
-      { angle: 225, color: "#F9A825" },
-      { angle: 270, color: "#FBC02D" },
-      { angle: 315, color: "#B71C1C" }
-    ].map((petal, i) => (
-      <g key={i} transform={`rotate(${petal.angle})`}>
-        <path
-          d="M0,-12
-             C18,-45 20,-75 0,-95
-             C-20,-75 -18,-45 0,-12"
-          fill={petal.color}
-          stroke="#555"
-          strokeWidth="1.8"
-        />
-      </g>
-    ))}
-
-    {/* Star */}
-    <polygon
-      points="
-        0,-58
-        16,-16
-        58,0
-        16,16
-        0,58
-        -16,16
-        -58,0
-        -16,-16"
-      fill="#E64A19"
-      stroke="#555"
-      strokeWidth="1.5"
-    />
-
-    {/* Inner flower */}
-    {[0, 72, 144, 216, 288].map((angle, i) => (
-      <g key={i} transform={`rotate(${angle})`}>
-        <path
-          d="M0,-4
-             C10,-18 10,-30 0,-38
-             C-10,-30 -10,-18 0,-4"
-          fill="#FBC02D"
-          stroke="#555"
-          strokeWidth="1"
-        />
-      </g>
-    ))}
-
-    {/* Center */}
-    <circle
-      cx="0"
-      cy="0"
-      r="8"
-      fill="#37474F"
-    />
-  </g>
-</svg>
+              <LogoComponent />
             </div>
             <div>
               <div className="leading-tight">

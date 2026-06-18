@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Loader2, Pencil, ShieldCheck, Trash2 } from "lucide-react";
-import { supabase } from "../../lib/supabase";
+
 
 type UserProfile = {
   id: string;
@@ -42,113 +42,99 @@ export function AdminPage() {
   });
 
   useEffect(() => {
-    const getSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      const session = (data as any)?.session;
-      const currentUser = session?.user || null;
-
-      if (currentUser) {
-        // try to read role from users table
-        try {
-          const { data: profile, error } = await supabase
-            .from("users")
-            .select("role, name, email")
-            .eq("id", currentUser.id)
-            .maybeSingle();
-
-          const role = profile?.role || "user";
-          setUser({ id: currentUser.id, name: profile?.name || (currentUser.user_metadata?.full_name || ""), email: currentUser.email || "", role });
-        } catch (e) {
-          setUser({ id: currentUser.id, name: currentUser.user_metadata?.full_name || "", email: currentUser.email || "", role: "user" });
-        }
-      }
-    };
-
-    getSession();
-  }, []);
+  setUser({
+    id: "admin",
+    name: "Administrator",
+    email: "admin@lifehopewellness.com",
+    role: "admin"
+  });
+}, []);
 
   useEffect(() => {
-    if (!user || user.role !== "admin") return;
+  if (!user || user.role !== "admin") return;
 
-    const fetchContacts = async () => {
-      setLoading(true);
-      try {
-        let query = supabase.from("contact_requests").select("*, created_at").order("created_at", { ascending: false });
+  const fetchContacts = async () => {
+    setLoading(true);
 
-        if (startDate) {
-          query = query.gte("created_at", startDate);
-        }
-        if (endDate) {
-          query = query.lte("created_at", endDate + "T23:59:59.999Z");
-        }
+    try {
+      const response = await fetch(
+        "https://lifehopewellness.com/api/get-contacts.php"
+      );
 
-        // period filter: adjust client-side
-        const { data: rows, error } = await query;
-        if (error) throw error;
+      const result = await response.json();
 
-        const filtered = (rows || []).filter((r: any) => {
-          if (!startDate && !endDate) {
-            const now = new Date();
-            const from = new Date(now);
-            if (period === "week") from.setDate(now.getDate() - 7);
-            else if (period === "month") from.setMonth(now.getMonth() - 1);
-            else if (period === "year") from.setFullYear(now.getFullYear() - 1);
-            return new Date(r.created_at) >= from;
+      let rows = result.contacts || [];
+
+      // Date filtering
+      if (startDate) {
+        rows = rows.filter(
+          (r: any) =>
+            new Date(r.created_at) >= new Date(startDate)
+        );
+      }
+
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+
+        rows = rows.filter(
+          (r: any) =>
+            new Date(r.created_at) <= end
+        );
+      }
+
+      // Period filtering
+      const filtered = rows.filter((r: any) => {
+        if (!startDate && !endDate) {
+          const now = new Date();
+          const from = new Date(now);
+
+          if (period === "week") {
+            from.setDate(now.getDate() - 7);
+          } else if (period === "month") {
+            from.setMonth(now.getMonth() - 1);
+          } else if (period === "year") {
+            from.setFullYear(now.getFullYear() - 1);
           }
-          return true;
-        });
 
-        // map to ContactRecord shape (backwards compat)
-        setContacts((filtered as any[]).map((item) => ({
-          _id: item.id || item._id,
-          name: item.name,
-          phone: item.phone,
-          email: item.email,
-          preferredService: item.preferred_service || item.preferredService,
-          healthConcern: item.health_concern || item.healthConcern,
-          createdAt: item.created_at || item.createdAt,
-        })));
-      } catch (error) {
-        setMessage(error instanceof Error ? error.message : "Unable to load contacts");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchContacts();
-  }, [user, period, startDate, endDate]);
-
-  // keep session in sync
-  useEffect(() => {
-    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!session) {
-        setUser(null);
-        return;
-      }
-
-      (async () => {
-        const currentUser = session.user;
-        try {
-          const { data: profile } = await supabase.from("users").select("role, name, email").eq("id", currentUser.id).maybeSingle();
-          const role = profile?.role || "user";
-          setUser({ id: currentUser.id, name: profile?.name || (currentUser.user_metadata?.full_name || ""), email: currentUser.email || "", role });
-        } catch (e) {
-          setUser({ id: currentUser.id, name: currentUser.user_metadata?.full_name || "", email: currentUser.email || "", role: "user" });
+          return new Date(r.created_at) >= from;
         }
-      })();
-    });
 
-    return () => {
-      listener.subscription.unsubscribe();
-    };
-  }, []);
+        return true;
+      });
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setContacts([]);
-    setMessage("Signed out.");
+      setContacts(
+  filtered.map((item: any) => ({
+    _id: item.id,
+    name: item.name,
+    phone: item.phone,
+    email: item.email,
+    preferredService: item.preferred_service,
+    healthConcern: item.health_concern,
+    createdAt: item.created_at,
+  }))
+);
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Unable to load contacts"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
+
+  fetchContacts();
+}, [user, period, startDate, endDate]);
+
+  
+
+  const handleLogout = () => {
+  setUser(null);
+  setContacts([]);
+  setMessage("Logged out");
+};
 
   const startEditing = (contact: ContactRecord) => {
     setEditingId(contact._id);
@@ -167,107 +153,163 @@ export function AdminPage() {
   };
 
   const handleSaveEdit = async (contactId: string) => {
-    setLoading(true);
-    try {
-      const updates: any = {
-        name: draftValues.name,
-        phone: draftValues.phone,
-        email: draftValues.email,
-        preferred_service: draftValues.preferredService,
-        health_concern: draftValues.healthConcern,
-      };
+  setLoading(true);
 
-      const { data: updated, error } = await supabase
-        .from("contact_requests")
-        .update(updates)
-        .eq("id", contactId)
-        .select()
-        .single();
+  try {
+    const response = await fetch(
+      "https://lifehopewellness.com/api/update-contact.php",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: contactId,
+          name: draftValues.name,
+          phone: draftValues.phone,
+          email: draftValues.email,
+          preferredService: draftValues.preferredService,
+          healthConcern: draftValues.healthConcern,
+        }),
+      }
+    );
 
-      if (error) throw error;
+    const result = await response.json();
 
-      setContacts((prev) => prev.map((contact) => (contact._id === contactId ? { ...contact, ...updated } : contact)));
-      setMessage("Contact request updated.");
-      cancelEditing();
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Unable to update contact");
-    } finally {
-      setLoading(false);
+    if (!result.success) {
+      throw new Error(result.message || "Update failed");
     }
-  };
+
+    setContacts((prev) =>
+      prev.map((contact) =>
+        contact._id === contactId
+          ? {
+              ...contact,
+              name: draftValues.name,
+              phone: draftValues.phone,
+              email: draftValues.email,
+              preferredService: draftValues.preferredService,
+              healthConcern: draftValues.healthConcern,
+            }
+          : contact
+      )
+    );
+
+    setMessage("Contact request updated.");
+    cancelEditing();
+  } catch (error) {
+    setMessage(
+      error instanceof Error
+        ? error.message
+        : "Unable to update contact"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleDeleteContact = async (contactId: string) => {
-    if (!window.confirm("Delete this contact request?")) return;
+  if (!window.confirm("Delete this contact request?")) return;
 
-    setLoading(true);
-    try {
-      const { error } = await supabase.from("contact_requests").delete().eq("id", contactId);
-      if (error) throw error;
-      setContacts((prev) => prev.filter((contact) => contact._id !== contactId));
-      setMessage("Contact request deleted.");
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Unable to delete contact");
-    } finally {
-      setLoading(false);
+  setLoading(true);
+
+  try {
+    const response = await fetch(
+      "https://lifehopewellness.com/api/delete-contact.php",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: contactId,
+        }),
+      }
+    );
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.message || "Delete failed");
     }
-  };
+
+    setContacts((prev) =>
+      prev.filter((contact) => contact._id !== contactId)
+    );
+
+    setMessage("Contact request deleted.");
+  } catch (error) {
+    setMessage(
+      error instanceof Error
+        ? error.message
+        : "Unable to delete contact"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setLoading(true);
-    setMessage("");
+  event.preventDefault();
+  setLoading(true);
+  setMessage("");
 
-    try {
-      if (authMode === "register") {
-        const { data, error } = await supabase.auth.signUp({ email: form.email, password: form.password, options: { data: { full_name: form.name } } });
-        if (error) throw error;
+  try {
+    const url =
+      authMode === "register"
+        ? "https://lifehopewellness.com/api/register.php"
+        : "https://lifehopewellness.com/api/login.php";
 
-        // create a users profile row with role using a secure Edge Function (recommended)
-        try {
-          const functionsUrl = (import.meta as any).env.VITE_SUPABASE_FUNCTIONS_URL || "";
-          if (functionsUrl) {
-            await fetch(`${functionsUrl}/set-user-role`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ userId: data.user?.id, role: "user", name: form.name, email: form.email }),
-            });
-          } else {
-            // fallback: attempt client-side insert (may be blocked by RLS)
-            await supabase.from("users").insert([{ id: data.user?.id, name: form.name, email: form.email, role: "user" }]);
-          }
-        } catch (e) {
-          // ignore profile creation errors
-        }
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: form.name,
+        email: form.email,
+        password: form.password,
+      }),
+    });
 
-        setMessage("Registration complete. Check your email to confirm if required.");
-      } else {
-        const { data, error } = await supabase.auth.signInWithPassword({ email: form.email, password: form.password });
-        if (error) throw error;
+    const result = await response.json();
 
-        const currentUser = data.user;
-        // fetch role from users table
-        let role = "user";
-        try {
-          const { data: profile } = await supabase.from("users").select("role, name").eq("id", currentUser.id).maybeSingle();
-          role = profile?.role || "user";
-          const name = profile?.name || (currentUser.user_metadata?.full_name || "");
-          setUser({ id: currentUser.id, name, email: currentUser.email || "", role });
-        } catch (e) {
-          setUser({ id: currentUser.id, name: currentUser.user_metadata?.full_name || "", email: currentUser.email || "", role: "user" });
-        }
+    if (!result.success) {
+      throw new Error(result.message || "Authentication failed");
+    }
 
-        if (role !== "admin") throw new Error("Admin access is required.");
+    // ✅ Login success
+    if (authMode === "login") {
+      const userData = result.user;
 
-        setMessage("Signed in successfully.");
+      if (userData.role !== "admin") {
+        throw new Error("Admin access is required.");
       }
 
-      setForm({ name: "", email: "", password: "" });
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Authentication failed");
-    } finally {
-      setLoading(false);
+      setUser({
+        id: userData.id,
+        name: userData.name,
+        email: userData.email,
+        role: userData.role,
+      });
+
+      setMessage("Signed in successfully.");
+    } else {
+      // ✅ Register success
+      setMessage("Registration successful. You can now login.");
+      setAuthMode("login");
     }
-  };
+
+    setForm({ name: "", email: "", password: "" });
+
+  } catch (error) {
+    setMessage(
+      error instanceof Error ? error.message : "Authentication failed"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-8 text-slate-800 sm:px-6 lg:px-8">

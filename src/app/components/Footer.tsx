@@ -1,4 +1,5 @@
 import { Phone, MapPin, Clock, Heart } from "lucide-react";
+import LogoComponent from "./LogoComponent";
 
 const services = [
   "Lifestyle Consultation", "Therapeutic Massage", "Disease Reversal",
@@ -14,21 +15,7 @@ export function Footer() {
           <div>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 flex-shrink-0">
-                <svg viewBox="0 0 44 44" className="w-full h-full">
-                  <circle cx="22" cy="22" r="10" fill="#1565c0" />
-                  {[0,30,60,90,120,150,180,210,240,270,300,330].map((angle, i) => (
-                    <line
-                      key={i}
-                      x1="22" y1="22"
-                      x2={22 + 20 * Math.cos((angle * Math.PI) / 180)}
-                      y2={22 + 20 * Math.sin((angle * Math.PI) / 180)}
-                      stroke="#f9a825" strokeWidth={i % 2 === 0 ? 2.5 : 1.5}
-                      strokeLinecap="round"
-                    />
-                  ))}
-                  <circle cx="22" cy="22" r="7" fill="#1e88e5" />
-                  <circle cx="22" cy="22" r="4" fill="white" />
-                </svg>
+                <LogoComponent />
               </div>
               <div>
                 <div>
@@ -69,7 +56,7 @@ export function Footer() {
           <div>
             <h4 className="text-white font-bold mb-5 text-sm uppercase tracking-wider">Our Centers</h4>
             <ul className="space-y-2.5">
-              {["Thiruvananthapuram (HQ)", "Patna", "Jaipur", "Varanasi", "Kolkata", "Asansol"].map((city) => (
+              {["Thiruvananthapuram", "Patna", "Jaipur", "Varanasi", "Kolkata", "Asansol"].map((city) => (
                 <li key={city}>
                   <a href="#centers" className="text-white/60 text-sm hover:text-[#4db6e8] transition-colors flex items-center gap-2">
                     <MapPin size={12} className="text-[#1e88e5] flex-shrink-0" />
