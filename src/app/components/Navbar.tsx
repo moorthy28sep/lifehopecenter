@@ -6,6 +6,7 @@ import LogoComponent from "./LogoComponent";
 const navLinks = [
   { label: "Home", href: "#home" },
   { label: "About", href: "#about" },
+  { label: "Services", href: "#services" },
   { label: "Wellness Programs", href: "#wellness" },
   { label: "Our Doctors", href: "#doctors" },
   { label: "Centers", href: "#centers" },

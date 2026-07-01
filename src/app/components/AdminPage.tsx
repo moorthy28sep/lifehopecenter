@@ -21,6 +21,20 @@ type ContactRecord = {
   createdAt: string;
 };
 
+type BookingRecord = {
+  id: string;
+  customer_name: string;
+  email: string;
+  phone: string;
+  selected_service?: string;
+  notes?: string;
+  payment_id?: string;
+  amount_paid?: string;
+  payment_status?: string;
+  booking_date_time?: string;
+  created_at?: string;
+};
+
 type FilterPeriod = "week" | "month" | "year";
 
 export function AdminPage() {
@@ -28,6 +42,7 @@ export function AdminPage() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [user, setUser] = useState<UserProfile | null>(null);
   const [contacts, setContacts] = useState<ContactRecord[]>([]);
+  const [bookings, setBookings] = useState<BookingRecord[]>([]);
   const [period, setPeriod] = useState<FilterPeriod>("month");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -129,7 +144,21 @@ export function AdminPage() {
   fetchContacts();
 }, [user, period, startDate, endDate]);
 
-  
+  useEffect(() => {
+    if (!user || user.role !== "admin") return;
+
+    const fetchBookings = async () => {
+      try {
+        const response = await fetch("https://lifehopewellness.com/api/get-bookings.php");
+        const result = await response.json();
+        setBookings(result.bookings || []);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchBookings();
+  }, [user]);
 
   const handleLogout = () => {
   setUser(null);
@@ -579,6 +608,41 @@ export function AdminPage() {
                 </button>
               </div>
             ) : null}
+
+            <div className="mb-8 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="text-lg font-bold text-[#0a2744]">Consultation bookings</h3>
+                <span className="rounded-full bg-[#1e88e5]/10 px-3 py-1 text-sm font-semibold text-[#1e88e5]">{bookings.length}</span>
+              </div>
+              {bookings.length === 0 ? (
+                <p className="text-sm text-slate-500">No consultation bookings have been recorded yet.</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-left text-sm">
+                    <thead>
+                      <tr className="border-b border-slate-200 text-slate-700">
+                        <th className="px-3 py-2 font-semibold">Name</th>
+                        <th className="px-3 py-2 font-semibold">Service</th>
+                        <th className="px-3 py-2 font-semibold">Amount</th>
+                        <th className="px-3 py-2 font-semibold">Status</th>
+                        <th className="px-3 py-2 font-semibold">Booked</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {bookings.map((booking) => (
+                        <tr key={booking.id} className="border-b border-slate-100 last:border-none">
+                          <td className="px-3 py-2 font-semibold text-[#0a2744]">{booking.customer_name}</td>
+                          <td className="px-3 py-2">{booking.selected_service || "—"}</td>
+                          <td className="px-3 py-2">₹{booking.amount_paid || "1000"}</td>
+                          <td className="px-3 py-2">{booking.payment_status || "pending"}</td>
+                          <td className="px-3 py-2">{booking.booking_date_time || booking.created_at || "—"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
 
             {loading ? (
               <div className="flex items-center justify-center py-12">

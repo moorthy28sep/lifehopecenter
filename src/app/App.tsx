@@ -9,6 +9,7 @@ import { CentersSection } from "./components/CentersSection";
 import { ContactSection } from "./components/ContactSection";
 import { Footer } from "./components/Footer";
 import { AdminPage } from "./components/AdminPage";
+import { ServicesSection } from "./components/ServicesSection";
 
 function HomePage() {
   return (
@@ -18,6 +19,7 @@ function HomePage() {
       <div className="pt-[98px]" style={{ marginTop: "-98px" }} />
       <HeroBanner />
       <AboutSection />
+      <ServicesSection />
       <WellnessPrograms />
       <DoctorsSection />
       <CentersSection />

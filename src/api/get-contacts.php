@@ -2,7 +2,7 @@
 
 header("Content-Type: application/json");
 
-include 'db.php';
+require_once 'db.php';
 
 $result = $conn->query("
     SELECT *

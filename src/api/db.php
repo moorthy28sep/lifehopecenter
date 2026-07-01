@@ -1,10 +1,11 @@
 <?php
 
-$host = "localhost";
+require_once 'config.php';
 
-$dbname = "u866750606_lifehope_db";
-$username = "u866750606_lifehope_user";
-$password = "Lifehope2026";
+$host = DB_HOST;
+$dbname = DB_NAME;
+$username = DB_USER;
+$password = DB_PASS;
 
 $conn = new mysqli(
     $host,
