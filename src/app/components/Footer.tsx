@@ -75,8 +75,8 @@ export function Footer() {
                 <Phone size={16} className="text-[#1e88e5] flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-white/40 text-xs uppercase tracking-wide mb-0.5">Phone / WhatsApp</p>
-                  <a href="tel:+91-892139004" className="text-white font-semibold hover:text-[#4db6e8] transition-colors">
-                    +91-892139004
+                  <a href="tel:+91-8921390046" className="text-white font-semibold hover:text-[#4db6e8] transition-colors">
+                    +91-8921390046
                   </a>
                 </div>
               </div>
@@ -87,7 +87,7 @@ export function Footer() {
                   <p className="text-white/70 text-sm leading-relaxed">
                     SDA Campus, Near Ponnara School,<br />
                     PS Nagar, Vallakkadu,<br />
-                    Thiruvananthapuram, Kerala – 695008
+                    Thiruvananthapuram, Kerala – 695008.
                   </p>
                 </div>
               </div>

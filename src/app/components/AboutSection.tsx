@@ -40,14 +40,14 @@ export function AboutSection() {
               <div className="space-y-4 mt-8">
                 <div className="rounded-2xl overflow-hidden h-36 shadow-lg">
                   <img
-                    src="https://images.unsplash.com/photo-1447452001602-7090c7ab2db3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHw1fHx5b2dhJTIwbWVkaXRhdGlvbiUyMG5hdHVyZSUyMGhlYWxpbmd8ZW58MXx8fHwxNzgwNjY1NDU2fDA&ixlib=rb-4.1.0&q=80&w=1080"
+                    src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=1200&q=80"
                     alt="Yoga wellness"
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="rounded-2xl overflow-hidden h-56 shadow-lg">
                   <img
-                    src="https://images.unsplash.com/photo-1545389336-cf090694435e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwyfHx5b2dhJTIwbWVkaXRhdGlvbiUyMG5hdHVyZSUyMGhlYWxpbmd8ZW58MXx8fHwxNzgwNjY1NDU2fDA&ixlib=rb-4.1.0&q=80&w=1080"
+                    src="https://images.unsplash.com/photo-1483721310020-03333e577078?auto=format&fit=crop&w=1200&q=80"
                     alt="Nature healing"
                     className="w-full h-full object-cover"
                   />

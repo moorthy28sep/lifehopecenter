@@ -18,12 +18,12 @@ const programs = [
     color: "#e53935",
   },
   {
-    icon: Leaf,
-    title: "Disease Reversal",
-    desc: "Proven protocols to reverse Diabetes, Hypertension, Obesity, PCOD and chronic conditions naturally.",
-    image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx5b2dhJTIwbWVkaXRhdGlvbiUyMG5hdHVyZSUyMGhlYWxpbmd8ZW58MXx8fHwxNzgwNjY1NDU2fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    color: "#43a047",
-  },
+  icon: Leaf,
+  title: "Disease Reversal",
+  desc: "Proven protocols to reverse Diabetes, Hypertension, Obesity, PCOD and chronic conditions naturally.",
+  image: "https://images.unsplash.com/photo-1508672019048-805c876b67e2?auto=format&fit=crop&w=1080&q=80",
+  color: "#43a047",
+},
   {
     icon: Droplets,
     title: "Hydrotherapy",
@@ -42,7 +42,7 @@ const programs = [
     icon: Brain,
     title: "Counselling",
     desc: "Professional psychological support and counselling to promote mental wellness and emotional balance.",
-    image: "https://images.unsplash.com/photo-1600618528240-fb9fc964b853?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwzfHx5b2dhJTIwbWVkaXRhdGlvbiUyMG5hdHVyZSUyMGhlYWxpbmd8ZW58MXx8fHwxNzgwNjY1NDU2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+     image: "https://images.unsplash.com/photo-1631815588090-d4bfec5b1ccb?auto=format&fit=crop&w=1080&q=80",
     color: "#8e24aa",
   },
   {

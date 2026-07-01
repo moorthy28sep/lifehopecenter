@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Navbar } from "./components/Navbar";
 import { HeroBanner } from "./components/HeroBanner";
 import { AboutSection } from "./components/AboutSection";
+import { Toaster } from "./components/ui/sonner";
 import { WellnessPrograms } from "./components/WellnessPrograms";
 import { DoctorsSection } from "./components/DoctorsSection";
 import { CentersSection } from "./components/CentersSection";
@@ -25,7 +26,7 @@ function HomePage() {
 
       {/* WhatsApp floating button */}
       <a
-        href="https://wa.me/892139004"
+        href="https://wa.me/918921390046"
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[#25d366] hover:bg-[#1ebe5d] flex items-center justify-center shadow-2xl hover:scale-110 transition-all duration-300"
@@ -46,6 +47,7 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/admin" element={<AdminPage />} />
       </Routes>
+      <Toaster />
     </BrowserRouter>
   );
 }

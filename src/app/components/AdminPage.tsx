@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Loader2, Pencil, ShieldCheck, Trash2 } from "lucide-react";
+import { ArrowLeft, Download, Loader2, Pencil, ShieldCheck, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 
 type UserProfile = {
@@ -196,13 +197,15 @@ export function AdminPage() {
     );
 
     setMessage("Contact request updated.");
+    toast.success("Contact request updated.");
     cancelEditing();
   } catch (error) {
-    setMessage(
+    const message =
       error instanceof Error
         ? error.message
-        : "Unable to update contact"
-    );
+        : "Unable to update contact";
+    setMessage(message);
+    toast.error(message);
   } finally {
     setLoading(false);
   }
@@ -238,14 +241,102 @@ export function AdminPage() {
     );
 
     setMessage("Contact request deleted.");
+    toast.success("Contact request deleted.");
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Unable to delete contact";
+    setMessage(message);
+    toast.error(message);
+  } finally {
+    setLoading(false);
+  }
+};
+
+  const exportCsv = () => {
+  if (contacts.length === 0) {
+    setMessage("No records available to export.");
+    return;
+  }
+
+  const headers = ["Name", "Phone", "Email", "Service", "Concern", "Submitted"];
+  const rows = contacts.map((contact) => [
+    contact.name,
+    contact.phone,
+    contact.email || "",
+    contact.preferredService || "",
+    contact.healthConcern || "",
+    new Date(contact.createdAt).toLocaleString(),
+  ]);
+
+  const csvContent = [headers, ...rows]
+    .map((row) => row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(","))
+    .join("\r\n");
+
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `contact-requests-${new Date().toISOString().slice(0, 10)}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+};
+
+  const downloadPdf = async () => {
+  if (contacts.length === 0) {
+    setMessage("No records available to export.");
+    return;
+  }
+
+  try {
+    const { jsPDF } = await import("jspdf");
+    await import("jspdf-autotable");
+
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+    const title = "Contact Requests";
+    const margin = 40;
+    const rowHeight = 20;
+
+    doc.setFontSize(16);
+    doc.text(title, margin, 50);
+
+    const headers = [["Name", "Phone", "Email", "Service", "Concern", "Submitted"]];
+    const body = contacts.map((contact) => [
+      contact.name,
+      contact.phone,
+      contact.email || "",
+      contact.preferredService || "",
+      contact.healthConcern || "",
+      new Date(contact.createdAt).toLocaleString(),
+    ]);
+
+    // @ts-ignore
+    doc.autoTable({
+      head: headers,
+      body,
+      startY: 70,
+      margin: { left: margin, right: margin },
+      theme: "grid",
+      styles: { fontSize: 8, cellPadding: 4 },
+      headStyles: { fillColor: [30, 136, 229], textColor: 255 },
+      columnStyles: {
+        0: { cellWidth: 100 },
+        1: { cellWidth: 80 },
+        2: { cellWidth: 120 },
+        3: { cellWidth: 90 },
+        4: { cellWidth: 120 },
+        5: { cellWidth: 100 },
+      },
+    });
+
+    doc.save(`contact-requests-${new Date().toISOString().slice(0, 10)}.pdf`);
   } catch (error) {
     setMessage(
       error instanceof Error
         ? error.message
-        : "Unable to delete contact"
+        : "Unable to generate PDF export."
     );
-  } finally {
-    setLoading(false);
   }
 };
 
@@ -467,6 +558,27 @@ export function AdminPage() {
             </div>
 
             {message ? <p className="mb-4 text-sm text-[#0a2744]">{message}</p> : null}
+
+            {contacts.length > 0 ? (
+              <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+                <button
+                  type="button"
+                  onClick={exportCsv}
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-[#1e88e5] hover:text-[#1e88e5]"
+                >
+                  <Download size={16} />
+                  Export CSV
+                </button>
+                <button
+                  type="button"
+                  onClick={downloadPdf}
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-[#1e88e5] hover:text-[#1e88e5]"
+                >
+                  <Download size={16} />
+                  Download PDF
+                </button>
+              </div>
+            ) : null}
 
             {loading ? (
               <div className="flex items-center justify-center py-12">

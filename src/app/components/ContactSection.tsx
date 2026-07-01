@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { motion, useInView } from "motion/react";
 import { Phone, MapPin, Clock, MessageCircle, Send } from "lucide-react";
+import { toast } from "sonner";
 
 
 const initialFormState = {
@@ -15,38 +16,38 @@ const branchDetails = [
   {
     city: "Thiruvananthapuram",
     state: "Kerala",
-    address: "SDA Campus, Near Ponnara School, PS Nagar, Vallakkadu",
-    phone: "+91 892139004",
+    address: "SDA Campus, Near Ponnara School, PS Nagar, Vallakkadu, Thiruvananthapuram, Kerala - 695008.",
+    phone: "+91-8921390046",
   },
   {
     city: "Patna",
     state: "Bihar",
-    address: "Lifestyle & Wellness Center, Patna",
-    phone: "+91 892139004",
+    address: "Jeevan Asha Kendra, Opposite All India Radio Station, Frazer Road, Patna, Bihar - 800001.",
+    phone: "+91-9955537270",
   },
   {
     city: "Jaipur",
     state: "Rajasthan",
-    address: "Lifestyle & Wellness Center, Jaipur",
-    phone: "+91 892139004",
+    address: "Jeevan Asha Kendra 27, Officer's Campus, Sirsi Rd, Khatipura, Jaipur, Rajasthan - 302012.",
+    phone: "+91-9772782782",
   },
   {
     city: "Varanasi",
     state: "Uttar Pradesh",
     address: "Lifestyle & Wellness Center, Varanasi",
-    phone: "+91 892139004",
+    phone: "+91-8921390046",
   },
   {
     city: "Kolkata",
     state: "West Bengal",
-    address: "Lifestyle & Wellness Center, Kolkata",
-    phone: "+91 892139004",
+    address: "Jeevan Asha Kendra, 28/1 Dinesh Pally, Bansdroni, West Bengal - 700070.",
+    phone: "+91-7890074855",
   },
   {
     city: "Asansol",
     state: "West Bengal",
-    address: "Lifestyle & Wellness Center, Asansol",
-    phone: "+91 892139004",
+    address: "Islampur, Ismile mor, SB Gorai Road Near Asansol District Hospital, Asansol, Bardhaman, West Bengal - 713301.",
+    phone: "+91-8827080298",
   },
 ];
 
@@ -96,6 +97,7 @@ export function ContactSection() {
     }
 
     setSubmitted(true);
+    toast.success("Your contact request has been submitted.");
 
     setFormState({
       name: "",
@@ -107,7 +109,9 @@ export function ContactSection() {
 
   } catch (err) {
     console.error(err);
-    setErrorMessage("Unable to submit request. Please try again.");
+    const message = err instanceof Error ? err.message : "Unable to submit request. Please try again.";
+    setErrorMessage(message);
+    toast.error(message);
   } finally {
     setIsSubmitting(false);
   }
@@ -146,9 +150,9 @@ export function ContactSection() {
               {
                 icon: Phone,
                 title: "Call / WhatsApp",
-                value: "+91-892139004",
+                value: "+91-8921390046",
                 sub: "Available Sun–Thu, 9 AM–5:30 PM",
-                href: "tel:+91-892139004",
+                href: "tel:+91-8921390046",
                 color: "#1e88e5",
               },
               {
@@ -156,7 +160,7 @@ export function ContactSection() {
                 title: "WhatsApp Chat",
                 value: "Chat with us on WhatsApp",
                 sub: "Quick response guaranteed",
-                href: "https://wa.me/892139004",
+                href: "https://wa.me/918921390046",
                 color: "#43a047",
               },
               {
@@ -197,7 +201,7 @@ export function ContactSection() {
                 </a>
               );
             })}
-
+{/*
             <div className="rounded-2xl border border-gray-100 bg-[#f4f8ff] p-4">
               <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-[#0a2744]">
                 <MapPin size={16} className="text-[#1e88e5]" />
@@ -219,7 +223,7 @@ export function ContactSection() {
                   </div>
                 ))}
               </div>
-            </div>
+            </div> */}
           </motion.div>
 
           {/* Contact Form */}

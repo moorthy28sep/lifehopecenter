@@ -10,7 +10,7 @@ const slides = [
   tag: "Natural • Safe • Effective",
 },
   {
-    image: "https://images.unsplash.com/photo-1524863479829-916d8e77f114?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHw0fHx5b2dhJTIwbWVkaXRhdGlvbiUyMG5hdHVyZSUyMGhlYWxpbmd8ZW58MXx8fHwxNzgwNjY1NDU2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=80",
     heading: "Reverse Disease Naturally",
     sub: "Overcome Diabetes, Hypertension, Obesity, PCOD and more through our evidence-based lifestyle programs.",
     tag: "Disease Reversal Programs",

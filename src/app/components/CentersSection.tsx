@@ -1,14 +1,14 @@
 import { useRef } from "react";
 import { motion, useInView } from "motion/react";
-import { MapPin, Clock } from "lucide-react";
+import { MapPin, Clock, Phone } from "lucide-react";
 
 const centers = [
-  { city: "Thiruvananthapuram", state: "Kerala", desc: "SDA Campus, Near Ponnara School, PS Nagar, Vallakkadu", isHQ: false },
-  { city: "Patna", state: "Bihar", desc: "Lifestyle & Wellness Center", isHQ: false },
-  { city: "Jaipur", state: "Rajasthan", desc: "Lifestyle & Wellness Center", isHQ: false },
-  { city: "Varanasi", state: "Uttar Pradesh", desc: "Lifestyle & Wellness Center", isHQ: false },
-  { city: "Kolkata", state: "West Bengal", desc: "Lifestyle & Wellness Center", isHQ: false },
-  { city: "Asansol", state: "West Bengal", desc: "Lifestyle & Wellness Center", isHQ: false },
+  { city: "Thiruvananthapuram", state: "Kerala", desc: "SDA Campus, Near Ponnara School, PS Nagar, Vallakkadu, Thiruvananthapuram, Kerala - 695008.",  phone: "+91 9876543210", isHQ: false },
+  { city: "Patna", state: "Bihar", desc: "Jeevan Asha Kendra, Opposite All India Radio Station, Frazer Road, Patna, Bihar - 800001.", phone: "+91-9955537270", isHQ: false },
+  { city: "Jaipur", state: "Rajasthan", desc: "Jeevan Asha Kendra 27, Officer's Campus, Sirsi Rd, Khatipura, Jaipur, Rajasthan - 302012.", phone: "+91-9772782782", isHQ: false },
+  { city: "Varanasi", state: "Uttar Pradesh", desc: "Lifestyle & Wellness Center", phone: "+91-8921390046", isHQ: false },
+  { city: "Kolkata", state: "West Bengal", desc: "Jeevan Asha Kendra 28/1 Dinesh Pally, Bansdroni, Kolkata 700070, West Bengal - 700070.", phone: "+91-7890074855", isHQ: false },
+  { city: "Asansol", state: "West Bengal", desc: "Islampur, Ismile mor, SB Gorai Road Near Asansol District Hospital, Asansol, Bardhaman, West Bengal - 713301.", phone: "+91-8827080298", isHQ: false },
 ];
 
 export function CentersSection() {
@@ -66,6 +66,22 @@ export function CentersSection() {
               <p className={`text-sm ${center.isHQ ? "text-white/70" : "text-gray-500"}`}>
                 {center.desc}
               </p>
+              {center.phone && (
+                <div className="mt-3 flex items-center gap-2">
+                  <Phone
+                    size={16}
+                    className={center.isHQ ? "text-[#4db6e8]" : "text-[#1e88e5]"}
+                  />
+                  <a
+                    href={`tel:${center.phone.replace(/\s+/g, "")}`}
+                    className={`text-sm font-medium hover:underline ${
+                      center.isHQ ? "text-white" : "text-[#0a2744]"
+                    }`}
+                  >
+                    {center.phone}
+                  </a>
+                </div>
+              )}
             </motion.div>
           ))}
         </div>
@@ -89,10 +105,10 @@ export function CentersSection() {
             </div>
           </div>
           <a
-            href="tel:+91-892139004"
+            href="tel:+91-8921390046"
             className="px-6 py-3 bg-[#1e88e5] hover:bg-[#1565c0] text-white font-bold rounded-full transition-colors duration-300 text-sm whitespace-nowrap"
           >
-            📞 Call: +91-892139004
+            📞 Call: +91-8921390046
           </a>
         </motion.div>
       </div>

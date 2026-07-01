@@ -28,8 +28,8 @@ export function Navbar() {
       {/* Top bar */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-[#0a2744] text-white text-sm py-1.5 px-6 flex justify-between items-center">
         <span className="opacity-80">Lifestyle & Wellness | Pathway to Healthy Life</span>
-        <a href="tel:+91-892139004" className="flex items-center gap-1.5 font-semibold hover:text-[#4db6e8] transition-colors">
-          <Phone size={14} /> +91-892139004
+        <a href="tel:+91-8921390046" className="flex items-center gap-1.5 font-semibold hover:text-[#4db6e8] transition-colors">
+          <Phone size={14} /> +91-8921390046
         </a>
       </div>
 
@@ -115,7 +115,7 @@ export function Navbar() {
                 ))}
                 <li>
                   <a
-                    href="tel:+91-892139004"
+                    href="tel:+91-8921390046"
                     className="inline-block px-5 py-2 bg-[#1e88e5] text-white text-sm font-bold rounded-full hover:bg-[#1565c0] transition-colors"
                   >
                     Book Now
