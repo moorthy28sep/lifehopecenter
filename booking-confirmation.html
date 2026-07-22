@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Consultation Booking Confirmed</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f7fbff;
+        color: #0a2744;
+      }
+      .card {
+        max-width: 620px;
+        margin: 60px auto;
+        background: white;
+        border-radius: 24px;
+        padding: 32px;
+        box-shadow: 0 16px 40px rgba(10, 39, 68, 0.08);
+      }
+      .pill { display: inline-block; padding: 8px 14px; border-radius: 999px; background: #e8f4ff; color: #1e88e5; font-weight: 700; margin-bottom: 16px; }
+      h1 { font-size: 2rem; margin: 0 0 12px; }
+      p { line-height: 1.7; color: #4b5563; }
+      a { color: #1e88e5; font-weight: 700; }
+      .summary { margin-top: 20px; background: #f8fafc; border-radius: 16px; padding: 16px; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="pill">Payment Received</div>
+      <h1>Consultation booking confirmed</h1>
+      <p>Your payment for the consultation was received successfully. The booking details have been captured and stored for follow-up.</p>
+      <div class="summary" id="summary">Loading booking details…</div>
+      <p style="margin-top: 20px;"><a href="/">Return to the homepage</a></p>
+    </div>
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const bookingId = params.get("booking_id");
+      const summary = document.getElementById("summary");
+
+      if (bookingId) {
+        fetch(`/api/booking-confirmation.php?booking_id=${bookingId}`)
+          .then((response) => response.json())
+          .then((result) => {
+            if (!result.success || !result.booking) {
+              summary.innerHTML = "Your consultation booking is being processed. Please contact the centre if you need help.";
+              return;
+            }
+            const booking = result.booking;
+            summary.innerHTML = `
+              <strong>Booking ID:</strong> ${booking.id}<br/>
+              <strong>Name:</strong> ${booking.customer_name}<br/>
+              <strong>Email:</strong> ${booking.email}<br/>
+              <strong>Phone:</strong> ${booking.phone}<br/>
+              <strong>Service:</strong> ${booking.selected_service}<br/>
+              <strong>Amount Paid:</strong> ₹${booking.amount_paid}<br/>
+              <strong>Status:</strong> ${booking.payment_status}<br/>
+              <strong>Booking Date:</strong> ${booking.booking_date_time}
+            `;
+          })
+          .catch(() => {
+            summary.innerHTML = "Your consultation booking is being processed. Please contact the centre if you need help.";
+          });
+      } else {
+        summary.innerHTML = "No booking reference found. Please contact the centre for support.";
+      }
+    </script>
+  </body>
+</html>
