@@ -104,11 +104,28 @@ export function ServicesSection() {
     });
   };
 
+  const normalizePhone = (phone: string) => {
+    if (!phone) return '';
+    // remove spaces, dashes and brackets
+    return phone.replace(/[^+0-9]/g, '');
+  };
+
+  const isValidPhone = (phone: string) => {
+    const normalized = normalizePhone(phone);
+    // Accept E.164-like numbers: optional leading + and 10-15 digits
+    return /^\+?\d{10,15}$/.test(normalized);
+  };
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setIsSubmitting(true);
 
     try {
+      const normalizedPhone = normalizePhone(formState.phone);
+      if (!isValidPhone(normalizedPhone)) {
+        setIsSubmitting(false);
+        toast.error('Please enter a valid phone number (10–15 digits, optional leading +).');
+        return;
+      }
       await loadCashfreeScript();
 
       const response = await fetch('/api/create-cashfree-order.php', {
@@ -119,7 +136,7 @@ export function ServicesSection() {
         body: JSON.stringify({
           name: formState.fullName,
           email: formState.email,
-          phone: formState.phone,
+          phone: normalizePhone(formState.phone),
           selectedService: formState.selectedService,
           notes: formState.notes,
         }),
@@ -139,27 +156,28 @@ export function ServicesSection() {
         throw new Error('Unable to initialize Cashfree payment session.');
       }
 
-      const cashfree = (window as any).Cashfree;
-      if (!cashfree) {
+      const cashfreeApi = (window as any).Cashfree;
+      if (!cashfreeApi) {
         setIsSubmitting(false);
         toast.error('Unable to load Cashfree Checkout.');
         return;
       }
 
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const cashfreeInstance = typeof cashfreeApi === 'function'
+        ? cashfreeApi({ mode: isLocalhost ? 'sandbox' : 'production' })
+        : cashfreeApi;
+
+      if (!cashfreeInstance) {
+        setIsSubmitting(false);
+        toast.error('Unable to initialize Cashfree Checkout.');
+        return;
+      }
+
       const checkoutConfig = {
-        orderId,
-        orderAmount: result.amount.toString(),
-        orderCurrency: 'INR',
-        customerName: result.customer_name,
-        customerEmail: result.email,
-        customerPhone: result.phone,
-        orderNote: 'Consultation Booking',
-        orderMeta: {
-          returnUrl: `${window.location.origin}/booking-confirmation.html?booking_id=${bookingId}`,
-          notifyUrl: `${window.location.origin}/api/cashfree/webhook.php`,
-        },
         paymentSessionId,
-        source: 'checkout',
+        returnUrl: `${window.location.origin}/booking-confirmation.html?booking_id=${bookingId}`,
+        mode: isLocalhost ? 'sandbox' : 'production',
         onSuccess: async (response: any) => {
           try {
             const verify = await fetch('/api/verify-payment.php', {
@@ -193,21 +211,31 @@ export function ServicesSection() {
           setIsSubmitting(false);
           toast.error(error?.message || 'Payment failed.');
         },
-        onDropout: (error: any) => {
+        onCancel: (error: any) => {
           setIsSubmitting(false);
           toast.error(error?.message || 'Payment was not completed.');
         },
       };
 
-      let checkout: { open: () => void } | null = null;
-      const initializer = (cashfree as any).initializer;
-      if (typeof initializer === 'function') {
-        checkout = initializer(checkoutConfig);
-      } else if ((cashfree as any).checkout?.init) {
-        checkout = (cashfree as any).checkout.init(checkoutConfig);
-      } else if (typeof (cashfree as any).Checkout === 'function') {
-        const checkoutInstance = new (cashfree as any).Checkout(checkoutConfig);
+      let checkout: { open?: () => void; render?: (target: HTMLElement | string) => void } | null = null;
+      if (typeof cashfreeInstance?.checkout === 'function') {
+        checkout = cashfreeInstance.checkout(checkoutConfig);
+      } else if (typeof cashfreeInstance?.initializer === 'function') {
+        checkout = cashfreeInstance.initializer(checkoutConfig);
+      } else if (typeof cashfreeInstance?.Checkout === 'function') {
+        const checkoutInstance = new cashfreeInstance.Checkout(checkoutConfig);
         checkout = checkoutInstance;
+      }
+
+      if (checkout?.render) {
+        let mountTarget = document.getElementById('cashfree-checkout-container') as HTMLElement | null;
+        if (!mountTarget) {
+          mountTarget = document.createElement('div');
+          mountTarget.id = 'cashfree-checkout-container';
+          document.body.appendChild(mountTarget);
+        }
+        checkout.render(mountTarget);
+        return;
       }
 
       if (!checkout || typeof checkout.open !== 'function') {

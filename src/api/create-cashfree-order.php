@@ -13,7 +13,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 require_once 'db.php';
 require_once 'config.php';
 
-$data = json_decode(file_get_contents('php://input'), true);
+set_error_handler(function ($severity, $message, $file, $line) {
+    throw new ErrorException($message, 0, $severity, $file, $line);
+});
+
+register_shutdown_function(function () {
+    $error = error_get_last();
+    if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_RECOVERABLE_ERROR], true)) {
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Server error while creating payment order.'
+        ]);
+    }
+});
+
+try {
+    $data = json_decode(file_get_contents('php://input'), true);
 
 if (!$data || empty($data['name']) || empty($data['email']) || empty($data['phone'])) {
     echo json_encode([
@@ -94,11 +110,12 @@ if (!$stmt->execute()) {
 $bookingId = $stmt->insert_id;
 $stmt->close();
 
-$baseProtocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
-$baseUrl = $baseProtocol . ($_SERVER['HTTP_HOST'] ?? 'lifehopewellness.com');
+$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') ? 'https://' : 'http://';
+$baseUrl = $scheme . ($_SERVER['HTTP_HOST'] ?? 'lifehopewellness.com');
 
 $orderPayload = [
-    'order_amount' => $consultationFee,
+    'order_id' => 'LFH-' . $bookingId . '-' . time(),
+    'order_amount' => (float) $consultationFee,
     'order_currency' => 'INR',
     'order_note' => 'Consultation Booking',
     'customer_details' => [
@@ -108,18 +125,32 @@ $orderPayload = [
         'customer_phone' => $customerPhone,
     ],
     'order_meta' => [
-        'return_url' => $baseUrl . '/booking-confirmation.html?booking_id=' . urlencode($bookingId),
+        'return_url' => $baseUrl . '/booking-confirmation.html?booking_id=' . urlencode((string) $bookingId),
         'notify_url' => $baseUrl . '/api/cashfree/webhook.php'
-    ]
+    ],
+    'order_expiry_time' => gmdate('Y-m-d\TH:i:s\Z', strtotime('+30 minutes')),
 ];
 
-$ch = curl_init(CASHFREE_API_BASE . '/pg/v2/orders');
+$apiBase = rtrim(CASHFREE_API_BASE, '/');
+$apiBase = preg_replace('#/(pg(/orders)?|pg/v[0-9]+/orders|orders)$#', '', $apiBase);
+$endpoint = $apiBase . '/pg/orders';
+
+$response = null;
+$httpCode = 0;
+$curlError = '';
+
+$ch = curl_init($endpoint);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     'x-client-id: ' . CASHFREE_APP_ID,
     'x-client-secret: ' . CASHFREE_SECRET_KEY,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json',
+    'x-api-version: 2025-01-01',
+    'x-request-id: ' . uniqid('cf-order-', true),
+    'x-idempotency-key: ' . bin2hex(random_bytes(16))
 ]);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($orderPayload));
 
@@ -138,19 +169,19 @@ if ($response === false) {
 
 $orderResult = json_decode($response, true);
 
-if ($httpCode < 200 || $httpCode >= 300 || empty($orderResult['status']) || strtolower($orderResult['status']) !== 'ok') {
+$cashfreeOrderId = $orderResult['order_id'] ?? null;
+$paymentSessionId = $orderResult['payment_session_id'] ?? $orderResult['payment_session_id'] ?? null;
+$appId = CASHFREE_APP_ID;
+$amount = $consultationFee;
+
+if ($httpCode < 200 || $httpCode >= 300 || empty($orderResult['order_id']) || empty($orderResult['payment_session_id'])) {
     echo json_encode([
         'success' => false,
         'message' => 'Cashfree order creation failed.',
-        'details' => $orderResult
+        'details' => $orderResult ?: ['message' => 'No response body returned from Cashfree.']
     ]);
     exit();
 }
-
-$cashfreeOrderId = $orderResult['order_id'] ?? null;
-$paymentSessionId = $orderResult['payment_session_id'] ?? null;
-$appId = CASHFREE_APP_ID;
-$amount = $consultationFee;
 
 if (!$cashfreeOrderId || !$paymentSessionId) {
     echo json_encode([
@@ -180,4 +211,11 @@ echo json_encode([
 ]);
 
 $conn->close();
-'    
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Unable to create payment order.',
+        'details' => $e->getMessage()
+    ]);
+}
