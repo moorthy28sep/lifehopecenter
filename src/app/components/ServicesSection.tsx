@@ -54,11 +54,37 @@ const services: ServiceItem[] = [
   },
 ];
 
+const doctors = [
+  "Dr. Divya Santhosh",
+  "Dr. Blessy Suveen",
+  "Dr. Rachel Giri",
+  "Dr. Austin Navis",
+];
+
+const allDoctorTimeSlots = [
+  "09:00 AM",
+  "10:00 AM",
+  "11:00 AM",
+  "12:00 PM",
+  "01:00 PM",
+  "02:00 PM",
+  "03:00 PM",
+  "04:00 PM",
+  "05:00 PM",
+  "06:00 PM",
+  "07:00 PM",
+  "08:00 PM",
+  "09:00 PM",
+];
+
 const initialFormState = {
   fullName: "",
   email: "",
   phone: "",
   selectedService: services[0].title,
+  doctorName: doctors[0],
+  appointmentDate: "",
+  appointmentTime: allDoctorTimeSlots[0],
   notes: "",
 };
 
@@ -67,11 +93,22 @@ export function ServicesSection() {
   const inView = useInView(ref, { once: true, margin: "-80px" });
   const [formState, setFormState] = useState(initialFormState);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const availableSlots = allDoctorTimeSlots;
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = event.target;
+
+    if (name === 'doctorName') {
+      setFormState((prev) => ({
+        ...prev,
+        doctorName: value,
+        appointmentTime: allDoctorTimeSlots.includes(prev.appointmentTime) ? prev.appointmentTime : allDoctorTimeSlots[0],
+      }));
+      return;
+    }
+
     setFormState((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -126,6 +163,13 @@ export function ServicesSection() {
         toast.error('Please enter a valid phone number (10–15 digits, optional leading +).');
         return;
       }
+
+      if (!formState.doctorName || !formState.appointmentDate || !formState.appointmentTime) {
+        setIsSubmitting(false);
+        toast.error('Please select a doctor, available date, and time slot.');
+        return;
+      }
+
       await loadCashfreeScript();
 
       const response = await fetch('/api/create-cashfree-order.php', {
@@ -138,6 +182,9 @@ export function ServicesSection() {
           email: formState.email,
           phone: normalizePhone(formState.phone),
           selectedService: formState.selectedService,
+          doctorName: formState.doctorName,
+          appointmentDate: formState.appointmentDate,
+          appointmentTime: formState.appointmentTime,
           notes: formState.notes,
         }),
       });
@@ -362,6 +409,23 @@ export function ServicesSection() {
               </div>
 
               <div>
+                <label className="mb-1.5 block text-sm font-semibold">Patient selects Doctor</label>
+                <select
+                  required
+                  name="doctorName"
+                  value={formState.doctorName}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border border-white/20 bg-white/95 px-4 py-3 text-sm text-slate-800 outline-none"
+                >
+                  {doctors.map((doctor) => (
+                    <option key={doctor} value={doctor}>
+                      {doctor}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
                 <label className="mb-1.5 block text-sm font-semibold">Selected Service</label>
                 <select
                   required
@@ -376,6 +440,38 @@ export function ServicesSection() {
                     </option>
                   ))}
                 </select>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1.5 block text-sm font-semibold">Available Date</label>
+                  <input
+                    required
+                    type="date"
+                    name="appointmentDate"
+                    min={new Date().toISOString().split('T')[0]}
+                    value={formState.appointmentDate}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border border-white/20 bg-white/95 px-4 py-3 text-sm text-slate-800 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-1.5 block text-sm font-semibold">Available Time Slot</label>
+                  <select
+                    required
+                    name="appointmentTime"
+                    value={formState.appointmentTime}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border border-white/20 bg-white/95 px-4 py-3 text-sm text-slate-800 outline-none"
+                  >
+                    {availableSlots.map((slot) => (
+                      <option key={slot} value={slot}>
+                        {slot}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div>

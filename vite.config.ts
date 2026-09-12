@@ -24,6 +24,16 @@ export default defineConfig({
     tailwindcss(),
   ],
 
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://lifehopewellness.com',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
+
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

@@ -27,6 +27,9 @@ type BookingRecord = {
   email: string;
   phone: string;
   selected_service?: string;
+  doctor_name?: string;
+  appointment_date?: string;
+  appointment_time?: string;
   notes?: string;
   payment_id?: string;
   amount_paid?: string;
@@ -159,6 +162,19 @@ export function AdminPage() {
 
     fetchBookings();
   }, [user]);
+
+  const formatDate = (value?: string) => {
+    if (!value) return "—";
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  };
 
   const handleLogout = () => {
   setUser(null);
@@ -611,18 +627,22 @@ export function AdminPage() {
 
             <div className="mb-8 rounded-2xl border border-slate-200 bg-slate-50 p-4">
               <div className="mb-3 flex items-center justify-between">
-                <h3 className="text-lg font-bold text-[#0a2744]">Consultation bookings</h3>
+                <h3 className="text-lg font-bold text-[#0a2744]">Consultation Service Bookings</h3>
                 <span className="rounded-full bg-[#1e88e5]/10 px-3 py-1 text-sm font-semibold text-[#1e88e5]">{bookings.length}</span>
               </div>
               {bookings.length === 0 ? (
-                <p className="text-sm text-slate-500">No consultation bookings have been recorded yet.</p>
+                <p className="text-sm text-slate-500">No consultation service bookings have been recorded yet.</p>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="min-w-full text-left text-sm">
                     <thead>
                       <tr className="border-b border-slate-200 text-slate-700">
                         <th className="px-3 py-2 font-semibold">Name</th>
+                        <th className="px-3 py-2 font-semibold">Doctor</th>
                         <th className="px-3 py-2 font-semibold">Service</th>
+                        <th className="px-3 py-2 font-semibold">Date</th>
+                        <th className="px-3 py-2 font-semibold">Time Slot</th>
+                        <th className="px-3 py-2 font-semibold">Notes</th>
                         <th className="px-3 py-2 font-semibold">Amount</th>
                         <th className="px-3 py-2 font-semibold">Status</th>
                         <th className="px-3 py-2 font-semibold">Booked</th>
@@ -630,9 +650,13 @@ export function AdminPage() {
                     </thead>
                     <tbody>
                       {bookings.map((booking) => (
-                        <tr key={booking.id} className="border-b border-slate-100 last:border-none">
+                        <tr key={booking.id} className="border-b border-slate-100 last:border-none align-top">
                           <td className="px-3 py-2 font-semibold text-[#0a2744]">{booking.customer_name}</td>
+                          <td className="px-3 py-2">{booking.doctor_name || "—"}</td>
                           <td className="px-3 py-2">{booking.selected_service || "—"}</td>
+                          <td className="px-3 py-2">{formatDate(booking.appointment_date)}</td>
+                          <td className="px-3 py-2">{booking.appointment_time || "—"}</td>
+                          <td className="px-3 py-2 max-w-[220px] whitespace-pre-wrap">{booking.notes || "—"}</td>
                           <td className="px-3 py-2">₹{booking.amount_paid || "1000"}</td>
                           <td className="px-3 py-2">{booking.payment_status || "pending"}</td>
                           <td className="px-3 py-2">{booking.booking_date_time || booking.created_at || "—"}</td>
@@ -653,6 +677,11 @@ export function AdminPage() {
                 No contact requests found for this period.
               </div>
             ) : (
+               <div className="mb-8 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="text-lg font-bold text-[#0a2744]">Contacts Bookings</h3>
+                <span className="rounded-full bg-[#1e88e5]/10 px-3 py-1 text-sm font-semibold text-[#1e88e5]">{contacts.length}</span>
+              </div>
               <div className="overflow-x-auto">
                 <table className="min-w-full text-left text-sm">
                   <thead>
@@ -772,6 +801,7 @@ export function AdminPage() {
                     })}
                   </tbody>
                 </table>
+              </div>
               </div>
             )}
           </div>
